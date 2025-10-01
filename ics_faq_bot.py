@@ -5,7 +5,7 @@ import numpy as np
 import re
 from datetime import datetime
 
-# Excel data
+# Excel data from "FIG - Bizx timesheet - Sep 2025-10-1-25.xlsx" and "FIG400_Issue and Query Log - 9-30-25.xlsx"
 excel_data = {
     "20113324": {
         "name": "Sudarsana Sai Meruva",
@@ -300,9 +300,9 @@ def lookup_excel_data(query):
                     f"- Project: {data['project']}")
     return ""
 
-# Streamlit UI with LangChain integration
+# Streamlit UI without LangChain
 st.title("ICS Team FAQs Elite Chatbot")
-st.markdown("Welcome, distinguished ICS Team member! Your exclusive guide to Policies, Payroll, Timesheets, Benefits, and more awaits. Current time: 04:41 PM EDT, October 1, 2025. 🌟")
+st.markdown("Welcome, distinguished ICS Team member! Your exclusive guide to Policies, Payroll, Timesheets, Benefits, and more awaits. Current time: 05:00 PM EDT, October 1, 2025. 🌟")
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
@@ -310,46 +310,29 @@ for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
 
-# LangChain Setup
-from langchain.chat_models import ChatOpenAI
-from langchain.prompts import PromptTemplate
-
-try:
-    api_key = st.secrets["OPENAI_API_KEY"]
-except KeyError:
-    st.error("API key not found in secrets. Please add OPENAI_API_KEY in Streamlit secrets for security.")
-    st.stop()  # Halt execution if no key
-llm = ChatOpenAI(api_key=api_key)
-prompt = PromptTemplate.from_template("Based on this context: {context}\n\nQuestion: {question}\n\nAnswer in a fun, child-friendly way with a premium tone for an elite ICS Team member:")
-chain = prompt | llm  # Chain prompt with LLM
-
 if prompt := st.chat_input("Pose your elite question (e.g., 'What is overtime?' or 'Sudarsana Sai Meruva status')"):
     user_name = prompt.split('@')[0] if '@' in prompt else "Valued Champion"
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
         st.markdown(prompt)
 
-    # Enhanced retrieval with LangChain
+    # Enhanced retrieval without LangChain
     excel_response = lookup_excel_data(prompt)
     retrieved = retrieve_sections(prompt)
-    context = (excel_response + "\n\n" + retrieved) if excel_response or retrieved else "No context available."
-    response = chain.invoke({"context": context, "question": prompt}).content if context else "No response generated due to missing context."
-
-    if not response:  # Fallback if LangChain fails
-        response = f"Dear @{user_name},\n\nThank you for your prestigious inquiry. Here’s your tailored response:\n\n"
-        if excel_response:
-            response += excel_response + "\n\n"
-        if retrieved:
-            response += retrieved + "\n\n"
-        else:
-            response += "No direct match found in our elite archives. Please refine your question or consult USHR@infinite.com.\n\n"
-        response += (f"Key Guidelines:\n"
-                     f"- Submit timesheets by Monday 11 AM ET or Saturday EOD for Fieldglass (Oct 11 deadline).\n"
-                     f"- Approval needed for OT, leave, or travel (Fiserv Manager, copy Infinite Manager).\n"
-                     f"- Contact: USPayroll@infinite.com (payroll), USHR@infinite.com (benefits), ITSG-US@infinite.com (IT).\n\n"
-                     f"Should this not suffice, share more details, and I’ll guide you further with care.\n\n"
-                     f"Best Regards,\nSuparno Chowdhury | Project Manager\nInfinite | The PlatformizationTM Company\n"
-                     f"Email: suparno.chowdhury@infinite.com | Cell: +1-470-404-0740")
+    response = f"Dear @{user_name},\n\nThank you for your prestigious inquiry. Here’s your tailored response:\n\n"
+    if excel_response:
+        response += excel_response + "\n\n"
+    if retrieved:
+        response += retrieved + "\n\n"
+    else:
+        response += "No direct match found in our elite archives. Please refine your question or consult USHR@infinite.com.\n\n"
+    response += (f"Key Guidelines:\n"
+                 f"- Submit timesheets by Monday 11 AM ET or Saturday EOD for Fieldglass (Oct 11 deadline).\n"
+                 f"- Approval needed for OT, leave, or travel (Fiserv Manager, copy Infinite Manager).\n"
+                 f"- Contact: USPayroll@infinite.com (payroll), USHR@infinite.com (benefits), ITSG-US@infinite.com (IT).\n\n"
+                 f"Should this not suffice, share more details, and I’ll guide you further with care.\n\n"
+                 f"Best Regards,\nSuparno Chowdhury | Project Manager\nInfinite | The PlatformizationTM Company\n"
+                 f"Email: suparno.chowdhury@infinite.com | Cell: +1-470-404-0740")
 
     st.session_state.messages.append({"role": "assistant", "content": response})
     with st.chat_message("assistant"):
