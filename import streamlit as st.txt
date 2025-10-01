@@ -1,8 +1,7 @@
 streamlit
-langchain
+langchain==0.1.0  # Pin to a stable version; adjust if needed
 openai
 tensorflow
 tensorflow-hub
 numpy
 pandas
-
