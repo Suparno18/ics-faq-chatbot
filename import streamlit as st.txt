@@ -1,5 +1,5 @@
 streamlit
-langchain==0.1.0  # Pin to a stable version; adjust if needed
+langchain==0.1.0  # Pinned version; adjust if needed
 openai
 tensorflow
 tensorflow-hub
