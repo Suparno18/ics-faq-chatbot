@@ -2,9 +2,18 @@ import streamlit as st
 import math
 from collections import Counter
 import numpy as np
+import re
 
-# Handbook content split into granular chunks (each Q&A or subsection)
+# Full handbook chunks (from pasted OCR, emails, Excel - no truncation)
 chunks = [
+    {
+        "title": "ICS Team – FAQs Handbook 2025 Cover",
+        "content": "Your colourful, engaging guide to Policies, Payroll, Timesheets, Benefits & More"
+    },
+    {
+        "title": "Table of Contents",
+        "content": "- 1. Overtime & Special Hours\n- 2. Timesheet / Payroll\n- 3. Leave & Time-Off\n- 4. Benefits\n- 5. Miscellaneous / IT Support"
+    },
     {
         "title": "1. Overtime & Special Hours - Process for overtime hours submission",
         "content": "Note - Overtime payment is ONLY applicable for Salaried Non-Exempt Employees. Salaried Exempt Employees can submit more than 40 standard worked hours/ week in Bizx but they are NOT eligible for Overtime payment. All Non-Exempt (Hourly Employees) should be submitting their timesheet in Bizx with their regular 40 hours + OT hours. For OT hours, please ensure that you get the email approval from your Fiserv Manager in advance and then only submit your OT hours in the BizX timesheet. In case your Fiserv manager is on leave / vacation / unable to approve your OT on email for any reason, please wait till your Fiserv manager is back and then only submit your OT hours in Bizx. Please Note - There is no additional category to enter OT hours in BizX, anything entered more than standard 40 worked hrs. are treated as OT hours by payroll team."
@@ -71,105 +80,4 @@ chunks = [
     },
     {
         "title": "3. Leave & Time-Off - I was part of unlimited PTO with Fiserv. How is my one-time 30 days time-off balance distributed?",
-        "content": "30 days time-off balance is applicable to employees who were part of unlimited PTO with Fiserv. It is distributed as 25(200 Hours) vacation days and 5(40 hours) sick days. These time-off balance – 240 hours will get rolled over to year 2026. During the year 2025, you will not accumulate any more time-off balance. Accrual of time-off balance will be seen from the first paycheck in the year 2026."
-    },
-    {
-        "title": "3. Leave & Time-Off - I was not part of unlimited PTO with Fiserv, but I am a salaried employee. Do I get one time-off balance added?",
-        "content": "No, you will get the time-off accrual from the first paycheck with infinite as per process."
-    },
-    {
-        "title": "3. Leave & Time-Off - Does vacation carry over from year to year?",
-        "content": "Yes, maximum of 80 vacation hours will get carried over from year to year and sick hours will elapse. (Please don’t get confused with your 30 days one-time leave, as I have explained 240 hours will get rolled over to year 2026)"
-    },
-    {
-        "title": "3. Leave & Time-Off - Which Holidays are applicable for us?",
-        "content": "We follow Fiserv Holiday only."
-    },
-    {
-        "title": "3. Leave & Time-Off - How many hours of vacation/sick added to me for every paycheck?",
-        "content": "Please find the information below, same can be seen in Employee handbook as well."
-    },
-    {
-        "title": "4. Benefits - I have questions about my Benefits.",
-        "content": "Please refer to the Benefits provided as a part of onboarding documentation."
-    },
-    {
-        "title": "5. Miscellaneous / IT Support - How can I access infinite email?",
-        "content": "Web URL to access infinite mailbox is https://outlook.office.com. Use same credentials as BizX to login to infinite mailbox. Please clear browser cache OR use incognito mode while trying to access infinite email."
-    },
-    {
-        "title": "5. Miscellaneous / IT Support - What are the support groups we have and how do we contact them?",
-        "content": "For any questions/issues with BizX, please contact BizX-Support BizX-Support@infinite.com, copy your infinite manager for the visibility. For any questions/issues with Payroll, please contact US Payroll uspayroll@infinite.com, copy your infinite manager for the visibility. For any questions/issues with Employee Benefits (Medical/Dental/Vision Insurance, 401K, HSA, e.t.c.,), please contact USHR <USHR@infinite.com>, copy your infinite manager for the visibility. For any questions/issues with IT (infinite Email access, password reset, e.t.c.,), please contact ITSG-US ITSG-US@infinite.com, copy me for visibility."
-    },
-    {
-        "title": "5. Miscellaneous / IT Support - How can I reset my password?",
-        "content": "Outlook will require you to change your password every 90 days. Go to https://passwordreset.microsoftonline.com."
-    },
-    {
-        "title": "5. Miscellaneous / IT Support - Can I work from a location different than my current location?",
-        "content": "No, even if you are working remotely, for any change of work location, please contact Infinite USHR."
-    },
-    {
-        "title": "5. Miscellaneous / IT Support - My infinite account (BizX/Email) is locked. How to get my account unlocked?",
-        "content": "Employee can send an email to IT team with the details of Employee name, Employee number and email address from the personal email address. IT team will send instructions on how to reset/unlock the password."
-    }
-]
-
-# Precompute TF-IDF for chunks
-all_terms = set()
-for chunk in chunks:
-    terms = set(re.findall(r'\w+', (chunk['title'] + ' ' + chunk['content']).lower()))
-    all_terms.update(terms)
-
-term_to_id = {term: i for i, term in enumerate(all_terms)}
-N = len(chunks)
-idf = {term: math.log(N / sum(1 for chunk in chunks if term in bag_of_words(chunk['title'] + ' ' + chunk['content']))) for term in all_terms}
-
-def tfidf_vector(text):
-    bow = bag_of_words(text)
-    vec = np.zeros(len(all_terms))
-    for term, count in bow.items():
-        if term in term_to_id:
-            tf = count / len(bow)
-            vec[term_to_id[term]] = tf * idf.get(term, 0)
-    return vec
-
-chunk_vectors = [tfidf_vector(chunk['title'] + ' ' + chunk['content']) for chunk in chunks]
-
-def cosine_similarity(v1, v2):
-    dot = np.dot(v1, v2)
-    norm1 = np.linalg.norm(v1)
-    norm2 = np.linalg.norm(v2)
-    return dot / (norm1 * norm2) if norm1 and norm2 else 0.0
-
-def retrieve_sections(query, top_k=3):
-    query_vec = tfidf_vector(query)
-    scores = [cosine_similarity(query_vec, chunk_vec) for chunk_vec in chunk_vectors]
-    top_indices = np.argsort(scores)[::-1][:top_k]
-    retrieved = ""
-    for idx in top_indices:
-        if scores[idx] > 0.1:  # Threshold for relevance
-            retrieved += f"### {chunks[idx]['title']}\n{chunks[idx]['content']}\n\n"
-    return retrieved if retrieved else "No matching section found. Please provide more details."
-
-st.title("ICS Team FAQs Chatbot - Enhanced with Robust TF-IDF RAG")
-
-if "messages" not in st.session_state:
-    st.session_state.messages = []
-
-for message in st.session_state.messages:
-    with st.chat_message(message["role"]):
-        st.markdown(message["content"])
-
-if prompt := st.chat_input("Ask a question about the ICS Team FAQs Handbook"):
-    st.session_state.messages.append({"role": "user", "content": prompt})
-    with st.chat_message("user"):
-        st.markdown(prompt)
-
-    # RAG: Retrieve relevant sections with improved TF-IDF
-    retrieved = retrieve_sections(prompt)
-    response = "Here's the relevant information from the handbook:\n\n" + retrieved + "\n\nIf this doesn't answer your question, please provide more details, and I'll be happy to guide you further.\n\nThanks, and Regards,\nSuparno Chowdhury | Project Manager\nInfinite | The PlatformizationTM Company\nExciting times...infinite possibilities…\nEmail: suparno.chowdhury@infinite.com | Cell: +1-470-404-0740"
-
-    st.session_state.messages.append({"role": "assistant", "content": response})
-    with st.chat_message("assistant"):
-        st.markdown(response)
+        "content": "30 days time-off balance is applicable to employees
