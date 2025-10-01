@@ -1,2 +1,7 @@
 streamlit
+langchain
+openai
+tensorflow
+tensorflow-hub
 numpy
+pandas
