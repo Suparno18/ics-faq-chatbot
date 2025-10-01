@@ -1,6 +1,4 @@
 streamlit
-langchain==0.1.0  # Pinned version; adjust if needed
-openai
 tensorflow
 tensorflow-hub
 numpy
