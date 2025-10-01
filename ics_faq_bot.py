@@ -4,7 +4,7 @@ from collections import Counter
 import numpy as np
 import re
 
-# Full handbook chunks (from pasted OCR, emails, Excel - no truncation)
+# Full handbook chunks (from pasted OCR, emails, Excel - fixed quotes and no truncation)
 chunks = [
     {
         "title": "ICS Team – FAQs Handbook 2025 Cover",
@@ -52,32 +52,4 @@ chunks = [
     },
     {
         "title": "2. Timesheet / Payroll - What is the policy for Jury Duty?",
-        "content": "Please inform your Fiserv & infinite manager about your Jury Duty and get an approval to attend the same. Send a copy of the summons to USHR@infinite.com. Salaried employees will be paid their base pay for up to two weeks of jury or subpoenaed witness duty served. Hourly employees do not receive pay for jury or subpoenaed witness duty unless mandated. Jury duty/Witness Leave is recorded as such on time records, and a copy of the summons and of the paid-time statements provided by the jurisdiction must be attached."
-    },
-    {
-        "title": "2. Timesheet / Payroll - How to access Paystubs and W-2s?",
-        "content": "Paystubs and W-2s can be accessed via URL, https://workforcenow.adp.com. If you have any questions and/or issues regarding ADP iPay, please contact Infinite Payroll at USPayroll@infinite.com."
-    },
-    {
-        "title": "2. Timesheet / Payroll - Where can I see my time-off balance?",
-        "content": "Time-off balance can only be seen on your most recent pay statement."
-    },
-    {
-        "title": "2. Timesheet / Payroll - I see an option to request time-off balance in ADP, can I request here?",
-        "content": "No, you do not have to request in ADP, this is not applicable for you."
-    },
-    {
-        "title": "3. Leave & Time-Off - What is the process to request time-off?",
-        "content": "Send an email to Fiserv Manager copying your infinite Manager. Once approved by Fiserv Manager, you are good to the take time-off."
-    },
-    {
-        "title": "3. Leave & Time-Off - What is pre-approve time off? How do I enter the timesheet for this?",
-        "content": "Time-Off Approved by your Fiserv Manager before joining infinite is called as pre-approve time-off. This is applicable to Salaried employees only. For all the pre-approved time-off, you will enter the hours as worked hours in BizX and submit."
-    },
-    {
-        "title": "3. Leave & Time-Off - How do I enter time for the time-off approved after joining Infinite in BizX?",
-        "content": "You will enter this time as non-worked hours in BizX and submit."
-    },
-    {
-        "title": "3. Leave & Time-Off - I was part of unlimited PTO with Fiserv. How is my one-time 30 days time-off balance distributed?",
-        "content": "30 days time-off balance is applicable to employees
+        "content": "Please inform your Fiserv & infinite manager about your Jury Duty and get an approval to attend the same. Send a copy of the summons to USHR@infinite.com. Salaried employees will be paid their base pay for up to two weeks of jury or subpoenaed witness duty served. Hourly employees do not receive pay for jury or subpoenaed witness duty unless mandated. Jury duty/Witness Leave is recorded
